@@ -1,28 +1,52 @@
-== README
+Run `bin/setup` and then `rails s` to get the app up and running.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Key end points:
+GET
+- /api/v1/users/:id
+- /api/v1/users/:id/playlists
+- /api/v1/playslists
+- /api/v1/playlists/:id
+- /api/v1/playlists/:id/songs
 
-Things you may want to cover:
+POST
+- /api/v1/playlists_songs
 
-* Ruby version
+Check out `specs/requests/api/v1/playlists_spec.rb` and `spec/requests/api/v1/playlists_songs_spec.rb` for implementation details.
 
-* System dependencies
+1.I chose a Rails/Postgresql stack with the JSONAPI Resources gem as my foundation for the following reasons
+Pros
+- Postgresql will easily scale to support millions of playlists, songs, and users
+- JSONAPI Resources comes out of the box with output formatting and pagination
+- Rails is a mature framework that has endless amounts of plugins (gems)
+- Versioned API
 
-* Configuration
+Cons
+- First time using JSON API Spec
+- JSON output is very verbose, depending on client support (iOS, Android, Javascript Frameworks), I cannot not say for certian I would
+  continue building out with this approach. A standard rails REST API using JBuilder might be more appropriate.
+- No out of the box caching, see https://github.com/cerebris/jsonapi-resources/issues/74
 
-* Database creation
+Optimizations
+- Research a better way to store playlist songs to remove the performance hit when rearranging song order on a large playlist. Possible
+  using in memory database such as MongoDb or Redis that has fast list reordering.  I researched the redis list storage but I not think
+  I could implement it in the given time frame.
+- Add caching of full responses or individual objects using Redis or Memcached
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+TODO:
+- Add more request specs for the other resources
+- Allow rearranging of songs on the playlist (acts_as_list gem)
+- Add ID3 metadata to songs
+- Add token-based user authentication using Devise, etc
+- Refactor song analytics (times played) to third-party service
+- Switch to JBuilder ( Maybe )
 
 
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+2. Reading or adding to a playlist with hundreds or thousands of songs will not incur any performance
+penality due to pagination being used and the resources being split accross multiple endpoints,
+(/user/1/playlists, /playlists/1, /playlists/1/songs).
+
+3. To test the performance of the API, I would write a benchmarking script that would
+populate the database with an assorted amount of records and test the response time of
+the various endpoints. I'd run the script both locally and against an environment that
+mirrored production. I'd also follow the guidelines outlined at
+http://guides.rubyonrails.org/v3.2.13/performance_testing.html

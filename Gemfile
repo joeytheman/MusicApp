@@ -28,7 +28,9 @@ gem 'jsonapi-resources'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
-  gem 'rspec-rails'
+  gem "factory_girl_rails", "~> 4.0"
+  gem 'faker'
+  gem 'rspec-rails', "~> 3.4"
 end
 
 group :development do
@@ -42,6 +44,5 @@ group :development do
 end
 
 group :test do
-  gem 'factory_girl_rails'
   gem 'shoulda-matchers'
 end
